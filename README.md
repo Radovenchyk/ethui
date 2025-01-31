@@ -14,6 +14,8 @@
 
 <p align="center">
     <img alt="licence badge" src="https://img.shields.io/github/license/ethui/ethui">
+    <a href="https://goreportcard.com/report/github.com/cosmos/cosmos-sdk">
+    </a>
     <img alt="release badge" src="https://img.shields.io/github/v/release/ethui/ethui">
     <img alt="build badge" src="https://img.shields.io/github/actions/workflow/status/ethui/ethui/rust.yml">
 </p>
