@@ -10,6 +10,7 @@ authors.workspace = true
 
 [dependencies]
 ethui-types.workspace = true
+ethui-networks.workspace = true
 ethui-settings.workspace = true
 ethui-broadcast.workspace = true
 

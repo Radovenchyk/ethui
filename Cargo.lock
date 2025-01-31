@@ -3434,6 +3434,7 @@ dependencies = [
  "alloy",
  "alloy-chains",
  "ethui-broadcast",
+ "ethui-networks",
  "ethui-settings",
  "ethui-types",
  "foundry-block-explorers 0.8.0",

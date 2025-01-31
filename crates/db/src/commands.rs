@@ -1,13 +1,14 @@
 use alloy::json_abi::JsonAbi;
+use ethui_networks::Networks;
 use ethui_types::{
-    events::Tx, transactions::PaginatedTx, Address, Contract, Erc721TokenData, TokenBalance,
-    TokenMetadata, UINotify, B256, U256,
+    events::Tx, transactions::PaginatedTx, Address, Contract, Erc721TokenData, GlobalState,
+    TokenBalance, TokenMetadata, UINotify, B256, U256,
 };
 
 use super::{Paginated, Pagination, Result};
 use crate::{
     utils::{fetch_etherscan_abi, fetch_etherscan_contract_name},
-    Db,
+    Db, Error,
 };
 
 #[tauri::command]
@@ -93,16 +94,29 @@ pub async fn db_get_contract_abi(
 
 #[tauri::command]
 pub async fn db_insert_contract(
-    chain_id: u64,
+    chain_id: u32,
     address: Address,
     db: tauri::State<'_, Db>,
 ) -> Result<()> {
-    let name = fetch_etherscan_contract_name(chain_id.into(), address).await?;
-    let abi = fetch_etherscan_abi(chain_id.into(), address)
+    let network = Networks::read()
+        .await
+        .get_network(chain_id)
+        .ok_or(Error::InvalidNetwork(chain_id))?;
+
+    if network.is_dev().await {
+        db.insert_contract_with_abi(chain_id, address, None, None)
+            .await?;
+        ethui_broadcast::ui_notify(UINotify::ContractsUpdated).await;
+
+        return Ok(());
+    }
+
+    let name = fetch_etherscan_contract_name((chain_id as u64).into(), address).await?;
+    let abi = fetch_etherscan_abi((chain_id as u64).into(), address)
         .await?
         .map(|abi| serde_json::to_string(&abi).unwrap());
 
-    db.insert_contract_with_abi(chain_id as u32, address, abi, name)
+    db.insert_contract_with_abi(chain_id, address, abi, name)
         .await?;
 
     ethui_broadcast::ui_notify(UINotify::ContractsUpdated).await;

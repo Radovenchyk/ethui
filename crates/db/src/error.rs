@@ -11,6 +11,12 @@ pub enum Error {
     #[error(transparent)]
     Etherscan(#[from] EtherscanError),
 
+    #[error("Invalid Network {0}")]
+    InvalidNetwork(u32),
+
+    #[error(transparent)]
+    Network(#[from] ethui_networks::Error),
+
     #[error("Invalid chain")]
     InvalidChain,
 
